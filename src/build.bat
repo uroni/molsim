@@ -1,0 +1,2 @@
+"C:\Program Files (x86)\Java\jdk1.6.0_25\bin\javah.exe" -classpath "D:\Developement\Eclipse-Workspace2\2011-SS-3DUI\bin;D:\Developement\Eclipse-Workspace2\2011-SS-3DUI\libs\jar\vecmath.jar" de.tum.in.far.threedui.elsim.Simulation
+pause

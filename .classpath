@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre6"/>
+	<classpathentry kind="lib" path="libs/jar/j3dcore.jar"/>
+	<classpathentry kind="lib" path="libs/jar/j3dutils.jar"/>
+	<classpathentry kind="lib" path="libs/jar/vecmath.jar"/>
+	<classpathentry kind="lib" path="libs/jar/j3d-vrml97.jar"/>
+	<classpathentry kind="lib" path="libs/jar/ubitrack.jar"/>
+	<classpathentry kind="lib" path="D:/Developement/Eclipse-Workspace2/2011-SS-3DUI/libs/jar/MS3DLoader-1.0.8.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -139,7 +139,7 @@ public class Simulation extends Behavior
     			}
     			else if(n.type==1)
     			{   				
-    				Box box=new Box(2.f, 2.f, 1.f, new ConnectionAppearance(n.opacy));
+    				Box box=new Box(2.f, 2.f, 1.f, new ConnectionAppearance(0.7f));
     				TransformGroup tg2=new TransformGroup();
     				Transform3D offset=new Transform3D();
     				offset.setTranslation(new Vector3d(0,0,0.0f));
@@ -191,7 +191,8 @@ public class Simulation extends Behavior
     				t.setScale(scale);
     				
     				Box box=(Box)( (TransformGroup)(tg.getChild(0))).getChild(0);
-    				box.getAppearance().setTransparencyAttributes(new TransparencyAttributes(TransparencyAttributes.BLENDED, 1.f-n.opacy));
+    				float o=1.f-(n.opacy/100.f)*0.8f;
+    				box.getAppearance().setTransparencyAttributes(new TransparencyAttributes(TransparencyAttributes.BLENDED, o));
     			}
     			
    				try {

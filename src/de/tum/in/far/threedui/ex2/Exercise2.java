@@ -70,7 +70,7 @@ public class Exercise2 {
 		sim.Connect(catom2_id, hatom5_id);
 		sim.Connect(catom2_id, hatom6_id);
 		BranchGroup tmp=new BranchGroup();
-		atomPoseReceiver = new AtomPoserReceiver(tmp, sim, catom_id, null_id);
+		atomPoseReceiver = new AtomPoserReceiver(tmp, sim, catom_id, null_id, "Kohlenstoff");
 		viewer.addObject(tmp);
 		if (!ubitrackFacade.setPoseCallback("posesink", atomPoseReceiver)) {
 			return;

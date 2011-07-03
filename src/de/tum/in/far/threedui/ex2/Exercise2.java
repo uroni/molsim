@@ -33,7 +33,7 @@ public class Exercise2 {
 	private PoseReceiver poseReceiver;
 	private PoseReceiver poseReceiver2;
 	private ImageReceiver imageReceiver;
-	private AtomPoserReceiver atomPoseReceiver;
+	private AtomPoserReceiver atomPoseReceiver, atomPoseReceiver2;
 	
 	private Simulation sim;
 	
@@ -47,7 +47,7 @@ public class Exercise2 {
 		
 		exercise2.initializeJava3D();
 		exercise2.initializeUbitrack();
-		exercise2.loadSheep();
+//		exercise2.loadSheep();
 		exercise2.linkUbitrackToViewer();
 	}
 	
@@ -75,8 +75,27 @@ public class Exercise2 {
 		if (!ubitrackFacade.setPoseCallback("posesink", atomPoseReceiver)) {
 			return;
 		}
-		poseReceiver2 = new PoseReceiver();
-		if (!ubitrackFacade.setPoseCallback("posesink2", poseReceiver2)) {
+		
+		null_id=sim.addAtom("Null", 5.f, 0.f, 0.f);
+		catom_id=sim.addAtom("Kohlenstoff", 0.f, 0.f, 0.f);
+		catom2_id=sim.addAtom("Kohlenstoff", 0.f, 0.f, 0.f);
+		hatom1_id=sim.addAtom("Wasserstoff", 1.f, 1.f, 1.f);
+		hatom2_id=sim.addAtom("Wasserstoff", 2.f, 1.f, 1.f);
+		hatom3_id=sim.addAtom("Wasserstoff", 3.f, 1.f, 1.f);
+		hatom4_id=sim.addAtom("Wasserstoff", 4.f, 1.f, 1.f);
+		hatom5_id=sim.addAtom("Wasserstoff", 7.f, 1.f, 1.f);
+		hatom6_id=sim.addAtom("Wasserstoff", 8.f, 1.f, 1.f);
+		sim.Connect(catom_id, hatom1_id);
+		sim.Connect(catom_id, hatom2_id);
+		sim.Connect(catom_id, hatom3_id);
+		sim.Connect(catom_id, catom2_id);
+		sim.Connect(catom2_id, hatom4_id);
+		sim.Connect(catom2_id, hatom5_id);
+		sim.Connect(catom2_id, hatom6_id);
+		BranchGroup tmp2=new BranchGroup();
+		atomPoseReceiver2 = new AtomPoserReceiver(tmp2, sim, catom_id, null_id, "Kohlenstoff");
+		viewer.addObject(tmp2);
+		if (!ubitrackFacade.setPoseCallback("posesink2", atomPoseReceiver2)) {
 			return;
 		}
 		imageReceiver = new ImageReceiver();
@@ -93,7 +112,7 @@ public class Exercise2 {
 		imageReceiver.setBackground(backgroundObject.getBackground());
 		
 		//poseReceiver.setTransformGroup(cubeObject.getTransformGroup());
-		poseReceiver2.setTransformGroup(sheepObject.getTransformGroup());
+//		poseReceiver2.setTransformGroup(sheepObject.getTransformGroup());
 	}
 	
 	private void loadSheep() {
@@ -137,6 +156,9 @@ public class Exercise2 {
 		tg.addChild(cubeObject);
 		sim.setSchedulingBounds(new BoundingSphere(new Point3d(), 200.0));
 		tg.addChild(sim);
+		
+//		sim2.setSchedulingBounds(new BoundingSphere(new Point3d(), 200.0));
+//		tg.addChild(sim2);
 		
 		tmp.addChild(tg);
 		

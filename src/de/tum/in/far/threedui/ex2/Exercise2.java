@@ -14,6 +14,7 @@ import com.sun.j3d.loaders.IncorrectFormatException;
 import com.sun.j3d.loaders.ParsingErrorException;
 import com.sun.j3d.loaders.Scene;
 
+import de.tum.in.far.threedui.elsim.NodeInfo;
 import de.tum.in.far.threedui.elsim.Simulation;
 import de.tum.in.far.threedui.ex1.solution.BlueAppearance;
 
@@ -55,20 +56,20 @@ public class Exercise2 {
 		ubitrackFacade.initUbitrack();
 		int null_id=sim.addAtom("Null", 5.f, 0.f, 0.f);
 		int catom_id=sim.addAtom("Kohlenstoff", 0.f, 0.f, 0.f);
-		int catom2_id=sim.addAtom("Kohlenstoff", 0.f, 0.f, 0.f);
+//		int catom2_id=sim.addAtom("Kohlenstoff", 0.f, 0.f, 0.f);
 		int hatom1_id=sim.addAtom("Wasserstoff", 1.f, 1.f, 1.f);
-		int hatom2_id=sim.addAtom("Wasserstoff", 2.f, 1.f, 1.f);
-		int hatom3_id=sim.addAtom("Wasserstoff", 3.f, 1.f, 1.f);
-		int hatom4_id=sim.addAtom("Wasserstoff", 4.f, 1.f, 1.f);
-		int hatom5_id=sim.addAtom("Wasserstoff", 7.f, 1.f, 1.f);
-		int hatom6_id=sim.addAtom("Wasserstoff", 8.f, 1.f, 1.f);
-		sim.Connect(catom_id, hatom1_id);
-		sim.Connect(catom_id, hatom2_id);
-		sim.Connect(catom_id, hatom3_id);
-		sim.Connect(catom_id, catom2_id);
-		sim.Connect(catom2_id, hatom4_id);
-		sim.Connect(catom2_id, hatom5_id);
-		sim.Connect(catom2_id, hatom6_id);
+//		int hatom2_id=sim.addAtom("Wasserstoff", 2.f, 1.f, 1.f);
+//		int hatom3_id=sim.addAtom("Wasserstoff", 3.f, 1.f, 1.f);
+//		int hatom4_id=sim.addAtom("Wasserstoff", 4.f, 1.f, 1.f);
+//		int hatom5_id=sim.addAtom("Wasserstoff", 7.f, 1.f, 1.f);
+//		int hatom6_id=sim.addAtom("Wasserstoff", 8.f, 1.f, 1.f);
+		sim.ConnectAndStore(catom_id, hatom1_id);
+//		sim.ConnectAndStore(catom_id, hatom2_id);
+//		sim.ConnectAndStore(catom_id, hatom3_id);
+//		sim.ConnectAndStore(catom_id, catom2_id);
+//		sim.ConnectAndStore(catom2_id, hatom4_id);
+//		sim.ConnectAndStore(catom2_id, hatom5_id);
+//		sim.ConnectAndStore(catom2_id, hatom6_id);
 		BranchGroup tmp=new BranchGroup();
 		atomPoseReceiver = new AtomPoserReceiver(tmp, sim, catom_id, null_id, "Kohlenstoff");
 		viewer.addObject(tmp);
@@ -78,20 +79,22 @@ public class Exercise2 {
 		
 		null_id=sim.addAtom("Null", 5.f, 0.f, 0.f);
 		catom_id=sim.addAtom("Kohlenstoff", 0.f, 0.f, 0.f);
-		catom2_id=sim.addAtom("Kohlenstoff", 0.f, 0.f, 0.f);
+//		catom2_id=sim.addAtom("Kohlenstoff", 0.f, 0.f, 0.f);
 		hatom1_id=sim.addAtom("Wasserstoff", 1.f, 1.f, 1.f);
-		hatom2_id=sim.addAtom("Wasserstoff", 2.f, 1.f, 1.f);
-		hatom3_id=sim.addAtom("Wasserstoff", 3.f, 1.f, 1.f);
-		hatom4_id=sim.addAtom("Wasserstoff", 4.f, 1.f, 1.f);
-		hatom5_id=sim.addAtom("Wasserstoff", 7.f, 1.f, 1.f);
-		hatom6_id=sim.addAtom("Wasserstoff", 8.f, 1.f, 1.f);
-		sim.Connect(catom_id, hatom1_id);
-		sim.Connect(catom_id, hatom2_id);
-		sim.Connect(catom_id, hatom3_id);
-		sim.Connect(catom_id, catom2_id);
-		sim.Connect(catom2_id, hatom4_id);
-		sim.Connect(catom2_id, hatom5_id);
-		sim.Connect(catom2_id, hatom6_id);
+//		hatom2_id=sim.addAtom("Wasserstoff", 2.f, 1.f, 1.f);
+//		hatom3_id=sim.addAtom("Wasserstoff", 3.f, 1.f, 1.f);
+//		hatom4_id=sim.addAtom("Wasserstoff", 4.f, 1.f, 1.f);
+//		hatom5_id=sim.addAtom("Wasserstoff", 7.f, 1.f, 1.f);
+//		hatom6_id=sim.addAtom("Wasserstoff", 8.f, 1.f, 1.f);
+		sim.ConnectAndStore(catom_id, hatom1_id);
+//		sim.ConnectAndStore(catom_id, hatom2_id);
+//		sim.ConnectAndStore(catom_id, hatom3_id);
+//		sim.ConnectAndStore(catom_id, catom2_id);
+//		sim.ConnectAndStore(catom2_id, hatom4_id);
+//		sim.ConnectAndStore(catom2_id, hatom5_id);
+//		sim.ConnectAndStore(catom2_id, hatom6_id);
+		
+		sim.storeNodes();
 		BranchGroup tmp2=new BranchGroup();
 		atomPoseReceiver2 = new AtomPoserReceiver(tmp2, sim, catom_id, null_id, "Kohlenstoff");
 		viewer.addObject(tmp2);
@@ -103,6 +106,10 @@ public class Exercise2 {
 			return;
 		}
 		ubitrackFacade.startDataflow();
+//		NodeInfo[] nInfo = sim.getNodes();
+//		System.out.println("Position x: "+nInfo[0].position.x);
+//		System.out.println("Position y: "+nInfo[0].position.y);
+//		System.out.println("Position z: "+nInfo[0].position.z);
 	}
 	
 	private void linkUbitrackToViewer() {
@@ -156,9 +163,6 @@ public class Exercise2 {
 		tg.addChild(cubeObject);
 		sim.setSchedulingBounds(new BoundingSphere(new Point3d(), 200.0));
 		tg.addChild(sim);
-		
-//		sim2.setSchedulingBounds(new BoundingSphere(new Point3d(), 200.0));
-//		tg.addChild(sim2);
 		
 		tmp.addChild(tg);
 		

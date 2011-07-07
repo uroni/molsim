@@ -13,4 +13,8 @@ public class NodeInfo
 	public float opacy;
 	public int type;
 	public int id;
+	
+	public String toString() {
+		return "id: "+id+" material: "+material;
+	}
 }

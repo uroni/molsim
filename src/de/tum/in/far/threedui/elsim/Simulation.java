@@ -1,8 +1,12 @@
 package de.tum.in.far.threedui.elsim;
 
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Behavior;
@@ -67,6 +71,59 @@ public class Simulation extends Behavior
     
     private TransformGroup parent;
     private Viewer viewer;
+    
+    private Set<HashSet<Integer>> molecules = Collections.synchronizedSet(new HashSet<HashSet<Integer>>());
+    private Map<Integer, NodeInfo> idToNode = Collections.synchronizedMap(new HashMap<Integer, NodeInfo>());
+    
+    public Map<Integer, NodeInfo> getIdToNode() {
+    	return idToNode;
+    }
+    public Set<HashSet<Integer>> getMolecules() {
+    	return molecules;
+    }
+    public void storeNodes() {
+    	NodeInfo[] nodes = getNodes();
+    	for(NodeInfo n : nodes) {
+    		idToNode.put(n.id,n);
+    	}
+    }
+    public synchronized boolean ConnectAndStore(int a1, int a2) {
+    	boolean found = false;
+    	for(HashSet<Integer> m : molecules) {
+    		if(m.contains(a1)) {
+    			m.add(a2);
+//    			for(HashSet<Integer> m2 : molecules) {
+//    				if(m2.contains(a2)) {
+//    					for (Integer i : m2) {
+//    						m.add(i);
+//    					}
+//    					molecules.remove(m2);
+//    				}
+//    			}
+    			found = true;
+    		}
+    	}
+    	if(!found) {
+    		System.out.println("creating new molecule for "+a1+" and "+a2);
+    		HashSet<Integer> newMolecule = new HashSet<Integer>();
+    		newMolecule.add(a1);
+    		newMolecule.add(a2);
+    		molecules.add(newMolecule);
+    	}
+    	System.out.println("connected "+a1+" and "+a2);
+		return Connect(a1,a2);
+	}
+    
+    public boolean isConnected(int a1, int a2) {
+//    	System.out.println("Are "+a1+" and "+a2+" connected?");
+    	for(HashSet<Integer> m : molecules) {
+    		if(m.contains(a1)) {
+    			if(m.contains(a2))
+    				return true;
+    		}
+    	}
+    	return false;
+    }
     
     public void update(TransformGroup parent)
     {

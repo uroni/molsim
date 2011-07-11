@@ -28,9 +28,9 @@ import ubitrack.SimplePoseReceiver;
 class UpdateBehaviour extends Behavior
 {
 
-	private AtomPoserReceiver recv;
+	private AtomPoseReceiver recv;
 	
-	public UpdateBehaviour(AtomPoserReceiver recv)
+	public UpdateBehaviour(AtomPoseReceiver recv)
 	{
 		this.recv=recv;
 	}
@@ -49,7 +49,7 @@ class UpdateBehaviour extends Behavior
 	
 }
 
-public class AtomPoserReceiver  extends SimplePoseReceiver {
+public class AtomPoseReceiver  extends SimplePoseReceiver {
 	
 	private Simulation sim;
 	private int atom_id;
@@ -64,7 +64,7 @@ public class AtomPoserReceiver  extends SimplePoseReceiver {
 	private Vector3d last_dir=new Vector3d();
 	private int curr_idle=0;
 
-	AtomPoserReceiver(BranchGroup bg, Simulation sim, int atom_id, int null_id, String atom_name)
+	AtomPoseReceiver(BranchGroup bg, Simulation sim, int atom_id, int null_id, String atom_name)
 	{
 		this.sim=sim;
 		this.atom_id=atom_id;
@@ -142,6 +142,10 @@ public class AtomPoserReceiver  extends SimplePoseReceiver {
 	}
 	
 	static boolean connected = false;
+	int connectedNode1id;
+	int connectedNode2id;
+	static double THRESHOLD = 0.12;
+	
 	private void handleCollision() {
 		NodeInfo[] nInfo = sim.getNodes();
 //		Set<HashSet<Integer>> molecules = sim.getMolecules();
@@ -149,29 +153,36 @@ public class AtomPoserReceiver  extends SimplePoseReceiver {
 		
 		double dist, absDist;
 		NodeInfo node1, node2;
-		if(connected)
+		
+		// check if the nodes are still close enough to each other
+		if(connected) {
+			NodeInfo connectedNode1 = null, connectedNode2 = null;
+			for(NodeInfo n : nInfo) {
+				if(n.id == connectedNode1id)
+					connectedNode1 = n;
+				if(n.id == connectedNode2id)
+					connectedNode2 = n;
+			}
+			if(connectedNode1 == null || connectedNode2 == null) {
+				System.out.println("one node is null");
+				return;
+			}
+			dist = distance(connectedNode1, connectedNode2);
+			Vector3f realSize1 = new Vector3f(connectedNode1.scale);
+			realSize1.x /= Simulation.simscale;
+			Vector3f realSize2 = new Vector3f(connectedNode2.scale);
+			realSize2.x /= Simulation.simscale;
+			absDist = dist - realSize1.x - realSize2.x;
+//			System.out.println("distance: "+dist+" - size: "+realSize1.x+" - "+realSize2.x + "("+node2.scale.x+")");
+//			System.out.println("type i: "+node1.type+" - type j: "+node2.type);
+			System.out.println("absDist: "+absDist);
+			if(absDist > THRESHOLD * 1.2) {
+				System.out.println("disconnecting...");
+				sim.DisconnectAndStore(connectedNode1id, connectedNode2id);
+				connected = false;
+			}
 			return;
-//		for(HashSet<Integer> mol : molecules) {
-//			for(HashSet<Integer> mol2 : molecules) {
-//				if(mol.equals(mol2))
-//					break;
-//				for(Integer node1Id : mol) {
-//					for(Integer node2Id : mol2) {
-//						node1 = idToNode.get(node1Id);
-//						node2 = idToNode.get(node2Id);
-//						dist = distance(node1, node2);
-//						Vector3f realSize1 = new Vector3f(node1.scale);
-//						realSize1.x /= Simulation.simscale;
-//						Vector3f realSize2 = new Vector3f(node2.scale);
-//						realSize2.x /= Simulation.simscale;
-//						absDist = dist - realSize1.x - realSize2.x;
-//						System.out.println("distance: "+dist+" - size: "+realSize1.x+" - "+realSize2.x + "("+node2.scale.x+")");
-//						if(absDist < 9 * (realSize1.x + realSize2.x))
-//							System.out.println("COLLISION between node "+ node1.toString()+" and "+ node2.toString() +" sizes: "+realSize1.x + " - "+realSize2.x +" dist: "+9 * (realSize1.x + realSize2.x));
-//					}
-//				}
-//			}
-//		}
+		}
 		
 		NodeInfo collNode1 = null, collNode2 = null;
 		double minDist = 0.1;
@@ -201,7 +212,7 @@ public class AtomPoserReceiver  extends SimplePoseReceiver {
 				absDist = dist - realSize1.x - realSize2.x;
 //				System.out.println("distance: "+dist+" - size: "+realSize1.x+" - "+realSize2.x + "("+node2.scale.x+")");
 //				System.out.println("type i: "+node1.type+" - type j: "+node2.type);
-				if(absDist < 0.1) {
+				if(absDist < THRESHOLD) {
 					if(absDist < minDist) {
 						collNode1 = node1;
 						collNode2 = node2;
@@ -215,6 +226,8 @@ public class AtomPoserReceiver  extends SimplePoseReceiver {
 			if(sim.CanConnect(collNode1.id, collNode2.id)) {
 				sim.ConnectAndStore(collNode1.id, collNode2.id);
 				// TODO: Hack!
+				connectedNode1id = collNode1.id;
+				connectedNode2id = collNode2.id;
 				connected = true;
 			}
 		}

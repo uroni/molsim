@@ -34,7 +34,7 @@ public class Exercise2 {
 	private PoseReceiver poseReceiver;
 	private PoseReceiver poseReceiver2;
 	private ImageReceiver imageReceiver;
-	private AtomPoserReceiver atomPoseReceiver, atomPoseReceiver2;
+	private AtomPoseReceiver atomPoseReceiver, atomPoseReceiver2;
 	
 	private Simulation sim;
 	
@@ -71,7 +71,7 @@ public class Exercise2 {
 //		sim.ConnectAndStore(catom2_id, hatom5_id);
 //		sim.ConnectAndStore(catom2_id, hatom6_id);
 		BranchGroup tmp=new BranchGroup();
-		atomPoseReceiver = new AtomPoserReceiver(tmp, sim, catom_id, null_id, "Kohlenstoff");
+		atomPoseReceiver = new AtomPoseReceiver(tmp, sim, catom_id, null_id, "Kohlenstoff");
 		viewer.addObject(tmp);
 		if (!ubitrackFacade.setPoseCallback("posesink", atomPoseReceiver)) {
 			return;
@@ -96,7 +96,7 @@ public class Exercise2 {
 		
 		sim.storeNodes();
 		BranchGroup tmp2=new BranchGroup();
-		atomPoseReceiver2 = new AtomPoserReceiver(tmp2, sim, catom_id, null_id, "Kohlenstoff");
+		atomPoseReceiver2 = new AtomPoseReceiver(tmp2, sim, catom_id, null_id, "Kohlenstoff");
 		viewer.addObject(tmp2);
 		if (!ubitrackFacade.setPoseCallback("posesink2", atomPoseReceiver2)) {
 			return;

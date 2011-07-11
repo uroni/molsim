@@ -87,32 +87,44 @@ public class Simulation extends Behavior
     		idToNode.put(n.id,n);
     	}
     }
-    public synchronized boolean ConnectAndStore(int a1, int a2) {
+    public boolean ConnectAndStore(int a1, int a2) {
     	boolean found = false;
-    	for(HashSet<Integer> m : molecules) {
-    		if(m.contains(a1)) {
-    			m.add(a2);
-//    			for(HashSet<Integer> m2 : molecules) {
-//    				if(m2.contains(a2)) {
-//    					for (Integer i : m2) {
-//    						m.add(i);
-//    					}
-//    					molecules.remove(m2);
-//    				}
-//    			}
-    			found = true;
-    		}
+    	HashSet<Integer> foundMolecule = null;
+    	synchronized(molecules) {
+	    	for(HashSet<Integer> m : molecules) {
+	    		if(m.contains(a1)) {
+//	    			m.add(a2);
+	    			found = true;
+	    			foundMolecule = m;
+	    		}
+	    	}
+	    	if(!found) {
+	    		System.out.println("creating new molecule for "+a1+" and "+a2);
+	    		HashSet<Integer> newMolecule = new HashSet<Integer>();
+	    		newMolecule.add(a1);
+	    		newMolecule.add(a2);
+	    		molecules.add(newMolecule);
+	    	} else {
+	    		for(HashSet<Integer> m2 : molecules) {
+    				if(m2.contains(a2)) {
+    					for (Integer i : m2) {
+    						foundMolecule.add(i);
+    					}
+    					molecules.remove(m2);
+    					break;
+    				}
+    			}
+	    	}
+	    	System.out.println("connected "+a1+" and "+a2);
+	    	System.out.println(molecules);
     	}
-    	if(!found) {
-    		System.out.println("creating new molecule for "+a1+" and "+a2);
-    		HashSet<Integer> newMolecule = new HashSet<Integer>();
-    		newMolecule.add(a1);
-    		newMolecule.add(a2);
-    		molecules.add(newMolecule);
-    	}
-    	System.out.println("connected "+a1+" and "+a2);
 		return Connect(a1,a2);
 	}
+    
+    public boolean DisconnectAndStore(int node1, int node2) {
+    	
+    	return Disconnect(node1, node2);
+    }
     
     public boolean isConnected(int a1, int a2) {
 //    	System.out.println("Are "+a1+" and "+a2+" connected?");

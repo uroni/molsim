@@ -1,4 +1,4 @@
-package de.tum.in.far.threedui.ex2;
+package de.tum.in.far.threedui.molsim;
 
 import javax.media.j3d.BranchGroup;
 import javax.media.j3d.TransformGroup;

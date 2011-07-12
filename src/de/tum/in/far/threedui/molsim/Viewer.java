@@ -1,4 +1,4 @@
-package de.tum.in.far.threedui.ex2;
+package de.tum.in.far.threedui.molsim;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.util.StringTokenizer;
 
-public class Viewer extends de.tum.in.far.threedui.ex1.solution.Viewer {
+public class Viewer extends de.tum.in.far.threedui.molsim.common.Viewer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -45,7 +45,7 @@ public class Viewer extends de.tum.in.far.threedui.ex1.solution.Viewer {
 		double[] intrinsics = new double[9];
 		try
 		{
-			System.out.println(Exercise2.DATAFLOW_PATH+File.separator +"CamCalib-3-3-Matrix" );
+			System.out.println(MoleculeSim.DATAFLOW_PATH+File.separator +"CamCalib-3-3-Matrix" );
 			FileReader fro = new FileReader(System.getProperty("user.dir") + File.separator + "dataflow" +File.separator +"CamCalib-3-3-Matrix" );
 			BufferedReader bro = new BufferedReader( fro );
 
@@ -55,7 +55,7 @@ public class Viewer extends de.tum.in.far.threedui.ex1.solution.Viewer {
 
 			while( stringRead != null ) // end of the file
 			{
-				System.out.println(Exercise2.DATAFLOW_PATH+File.separator +"CamCalib-3-3-Matrix" );
+				System.out.println(MoleculeSim.DATAFLOW_PATH+File.separator +"CamCalib-3-3-Matrix" );
 				StringTokenizer st = new StringTokenizer( stringRead, " " );
 
 

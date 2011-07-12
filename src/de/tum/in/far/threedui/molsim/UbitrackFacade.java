@@ -1,4 +1,4 @@
-package de.tum.in.far.threedui.ex2;
+package de.tum.in.far.threedui.molsim;
 
 import ubitrack.SimpleFacade;
 import ubitrack.SimpleImageReceiver;
@@ -16,12 +16,12 @@ public class UbitrackFacade {
 	public void initUbitrack() {
 		ubitrack.initLogging();
 		
-		facade = new SimpleFacade(Exercise2.COMPONENT_DIRECTORY);
+		facade = new SimpleFacade(MoleculeSim.COMPONENT_DIRECTORY);
 		
 		if (facade.getLastError() != null) {
 			return;
 		}
-		if (!facade.loadDataflow(Exercise2.DATAFLOW_PATH)) {
+		if (!facade.loadDataflow(MoleculeSim.DATAFLOW_PATH)) {
 			return;
 		}
 	}

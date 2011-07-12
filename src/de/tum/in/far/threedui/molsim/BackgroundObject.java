@@ -1,4 +1,4 @@
-package de.tum.in.far.threedui.ex2;
+package de.tum.in.far.threedui.molsim;
 
 import java.awt.image.BufferedImage;
 

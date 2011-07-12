@@ -1,4 +1,4 @@
-package de.tum.in.far.threedui.ex1.solution;
+package de.tum.in.far.threedui.molsim.common;
 
 import java.awt.GraphicsConfiguration;
 

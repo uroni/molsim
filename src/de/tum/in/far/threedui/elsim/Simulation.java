@@ -1,9 +1,11 @@
 package de.tum.in.far.threedui.elsim;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -34,8 +36,93 @@ import com.sun.j3d.utils.geometry.Primitive;
 import com.sun.j3d.utils.geometry.Sphere;
 import com.sun.j3d.utils.image.TextureLoader;
 
-import de.tum.in.far.threedui.ex1.solution.BlueAppearance;
-import de.tum.in.far.threedui.ex2.Viewer;
+import de.tum.in.far.threedui.molsim.Viewer;
+import de.tum.in.far.threedui.molsim.common.BlueAppearance;
+
+
+class SimAtom
+{
+	public SimAtom(int aid, String name)
+	{
+		atom_id=aid;
+		this.setName(name);
+		if(name.equals("Kohlenstoff"))
+			setEls(4);
+		else if(name.equals("Wasserstoff"))
+			setEls(1);
+		else if(name.equals("Sauerstoff"))
+			setEls(6);
+	}
+	
+	public boolean ConnectedTo(int aid)
+	{
+		if( atom_id==aid)
+			return true;
+		
+		if(marked)
+			return false;
+		else
+			marked=true;
+		
+		for(SimAtom a: connectedAtoms)
+		{
+			if( a.ConnectedTo(aid) )
+				return true;
+		}
+		return false;
+	}
+	
+	public List<SimAtom> getConnectedAtoms()
+	{
+		List<SimAtom> ret=new ArrayList<SimAtom>();
+		
+		if(marked)
+			return ret;
+		else
+			marked=true;
+		
+		
+		for(SimAtom a: connectedAtoms)
+		{
+			List<SimAtom> t=a.getConnectedAtoms();
+			ret.addAll(t);
+		}
+		return ret;
+	}
+	
+	public void Connect(SimAtom a)
+	{
+		connectedAtoms.add(a);
+	}
+	
+	public void Disconnect(SimAtom a)
+	{
+		connectedAtoms.remove(a);
+	}
+	
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setEls(int els) {
+		this.els = els;
+	}
+
+	public int getEls() {
+		return els;
+	}
+
+	private int atom_id;
+	private Set<SimAtom> connectedAtoms=new HashSet<SimAtom>();
+	public boolean marked;
+	private String name;
+	
+	private int els=0;
+}
 
 
 public class Simulation extends Behavior
@@ -52,17 +139,19 @@ public class Simulation extends Behavior
     }
 	
 	public native NodeInfo[] getNodes();
-	public native int addAtom(String name, float x, float y, float z);
+	private native int addAtom(String name, float x, float y, float z);
 	public native void removeAtom(int id);
 	public native boolean CanConnect(int a1, int a2);
 	public native boolean Connect(int a1, int a2);
 	public native boolean Disconnect(int a1, int a2);
-	public native boolean removeMolecule(int id);
+	private native boolean removeMolecule(int id);
 	public native void setAtomPosition(int id, float x, float y, float z);
 	public native void freeAtomPosition(int id);
 	
     private native long init();
     private long simptr;
+    
+    private NodeInfo[] cached_nodes=new NodeInfo[1];
     
     public static native Vector3f getRotationToTarget(Vector3f position, Vector3f target);
     
@@ -72,84 +161,170 @@ public class Simulation extends Behavior
     private TransformGroup parent;
     private Viewer viewer;
     
-    private Set<HashSet<Integer>> molecules = Collections.synchronizedSet(new HashSet<HashSet<Integer>>());
-    private Map<Integer, NodeInfo> idToNode = Collections.synchronizedMap(new HashMap<Integer, NodeInfo>());
+    private Map<Integer, SimAtom> sim_atoms=new HashMap<Integer, SimAtom>();
     
-    public Map<Integer, NodeInfo> getIdToNode() {
-    	return idToNode;
+    public int SimAddAtom(String name, float x, float y, float z)
+    {
+    	int id=addAtom(name, x, y, z);
+    	sim_atoms.put(id, new SimAtom(id, name));
+    	return id;
     }
-    public Set<HashSet<Integer>> getMolecules() {
-    	return molecules;
-    }
-    public void storeNodes() {
-    	NodeInfo[] nodes = getNodes();
-    	for(NodeInfo n : nodes) {
-    		idToNode.put(n.id,n);
+    
+    public boolean SimConnect(int a1, int a2)
+    {
+    	boolean b=Connect(a1, a2);
+    	if(b)
+    	{
+    		SimOnlyConnect(a1, a2);
     	}
+    	return b; 
     }
-    public boolean ConnectAndStore(int a1, int a2) {
-    	boolean found = false;
-    	HashSet<Integer> foundMolecule = null;
-    	synchronized(molecules) {
-	    	for(HashSet<Integer> m : molecules) {
-	    		if(m.contains(a1)) {
-//	    			m.add(a2);
-	    			found = true;
-	    			foundMolecule = m;
-	    		}
-	    	}
-	    	if(!found) {
-	    		System.out.println("creating new molecule for "+a1+" and "+a2);
-	    		HashSet<Integer> newMolecule = new HashSet<Integer>();
-	    		newMolecule.add(a1);
-	    		newMolecule.add(a2);
-	    		molecules.add(newMolecule);
-	    	} else {
-	    		for(HashSet<Integer> m2 : molecules) {
-    				if(m2.contains(a2)) {
-    					for (Integer i : m2) {
-    						foundMolecule.add(i);
-    					}
-    					molecules.remove(m2);
-    					break;
-    				}
-    			}
-	    	}
-	    	System.out.println("connected "+a1+" and "+a2);
-	    	System.out.println(molecules);
+    
+    public boolean SimPretendConnect(int a1, int a2)
+    {
+    	boolean b=Connect(a1, a2);
+    	if(b)
+    	{
+    		SimAtom sa1=sim_atoms.get(a1);
+        	SimAtom sa2=sim_atoms.get(a2);
+        	if(sa1!=null && sa2!=null)
+        	{
+        		sa1.setEls(sa1.getEls()-1);
+        		sa2.setEls(sa2.getEls()-1);
+        	}
     	}
-		return Connect(a1,a2);
-	}
-    
-    public boolean DisconnectAndStore(int node1, int node2) {
-    	
-    	return Disconnect(node1, node2);
+    	return b; 
     }
     
-    public boolean isConnected(int a1, int a2) {
-//    	System.out.println("Are "+a1+" and "+a2+" connected?");
-    	for(HashSet<Integer> m : molecules) {
-    		if(m.contains(a1)) {
-    			if(m.contains(a2))
-    				return true;
-    		}
+    public boolean SimOnlyConnect(int a1, int a2)
+    {
+    	SimAtom sa1=sim_atoms.get(a1);
+    	SimAtom sa2=sim_atoms.get(a2);
+    	if(sa1!=null && sa2!=null)
+    	{
+    		sa1.Connect(sa2);
+    		sa2.Connect(sa1);
+    		return true;
     	}
     	return false;
     }
     
-    public void update(TransformGroup parent)
+    public boolean SimDisconnect(int a1, int a2)
+    {
+    	boolean b=Disconnect(a1, a2);
+    	if(b)
+    	{
+	    	SimAtom sa1=sim_atoms.get(a1);
+	    	SimAtom sa2=sim_atoms.get(a2);
+	    	if(sa1!=null && sa2!=null)
+	    	{
+	    		sa1.Disconnect(sa2);
+	    		sa2.Disconnect(sa1);
+	    		sa1.setEls(sa1.getEls()+1);
+        		sa2.setEls(sa2.getEls()+1);
+	    	}
+    	}
+    	return b; 
+    }
+    
+    public boolean SimPretendDisconnect(int a1, int a2)
+    {
+    	boolean b=Disconnect(a1, a2);
+    	if(b)
+    	{
+	    	SimAtom sa1=sim_atoms.get(a1);
+	    	SimAtom sa2=sim_atoms.get(a2);
+	    	if(sa1!=null && sa2!=null)
+	    	{
+	    		sa1.setEls(sa1.getEls()+1);
+        		sa2.setEls(sa2.getEls()+1);
+	    	}
+    	}
+    	return b; 
+    }
+    
+    private void unmarkAtoms()
+    {
+    	for(Entry<Integer, SimAtom> e: sim_atoms.entrySet() )
+    	{
+    		e.getValue().marked=false;
+    	}
+    }
+    
+    public boolean SimRemoveMolecule(int id)
+    {
+    	boolean b=removeMolecule(id);
+    	if(b)
+    	{
+	    	SimAtom a=sim_atoms.get(id);
+	    	if(a!=null)
+	    	{
+	    		unmarkAtoms();
+		    	List<SimAtom> l=a.getConnectedAtoms();
+		    	for(SimAtom c: l)
+		    	{
+		    		sim_atoms.remove(c);
+		    	}
+	    	}
+    	}
+    	return b;
+    }
+    
+    public boolean isConnected(int a1, int a2)
+    {
+    	SimAtom a=sim_atoms.get(a1);
+    	if(a!=null)
+    	{
+    		unmarkAtoms();
+    		return a.ConnectedTo(a2);
+    	}
+    	return false;
+    }
+    
+    public boolean SimCanConnect(int a1, int a2)
+    {
+    	SimAtom sa1=sim_atoms.get(a1);
+    	SimAtom sa2=sim_atoms.get(a2);
+    	if(sa1!=null && sa2!=null)
+    	{
+    		if(sa1.getEls()>0 && sa2.getEls()>0)
+    			return true;
+    		else
+    			return false;
+    	}
+    	else
+    	{
+    		return false;
+    	}
+    }
+        
+    public NodeInfo[] getCached_nodes() {
+		return cached_nodes;
+	}
+
+	public void setCached_nodes(NodeInfo[] cached_nodes) {
+		this.cached_nodes = cached_nodes;
+	}
+
+	public void update(TransformGroup parent)
     {
     	NodeInfo[] new_nodes=getNodes();
+    	if(cached_nodes.length!=new_nodes.length)
+    		cached_nodes=new NodeInfo[new_nodes.length];
+    	
     	HashMap<TransformGroup, Boolean> found=new HashMap<TransformGroup, Boolean>();
     	for(int i=0;i<new_nodes.length;++i)
-    	{
+    	{    		
     		NodeInfo n=new_nodes[i];
+    		
+    		cached_nodes[i]=new_nodes[i].clone();
+    		
     		n.position.x/=simposscale;
     		n.position.y/=simposscale;
     		n.position.z/=simposscale;
     		
     		TransformGroup tg=nodes.get(n.id);
-    		if(tg==null)
+    		if(tg==null && (n.type!=0 || n.material.length()>0))
     		{
     			BranchGroup bg=new BranchGroup();
     			bg.setCapability(BranchGroup.ALLOW_DETACH);
@@ -222,7 +397,7 @@ public class Simulation extends Behavior
     			parent.addChild(bg);
     			found.put(tg, true);
     		}
-    		else
+    		else if(tg!=null)
     		{
     			found.put(tg, true);
     			Transform3D t=new Transform3D();

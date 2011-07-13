@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/3DUI-Class"/>
+<listEntry value="/2011-SS-3DUI/src/de/tum/in/far/threedui/molsim/MoleculeSim.java"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
-<listEntry value="4"/>
+<listEntry value="1"/>
 </listAttribute>
 <mapAttribute key="org.eclipse.debug.core.environmentVariables">
-<mapEntry key="PATH" value="${project_loc}\libs\ubitrack\bin"/>
+<mapEntry key="PATH" value="D:\Developement\Eclipse-Workspace2\2011-SS-3DUI\libs\ubitrack\bin"/>
 </mapAttribute>
 <listAttribute key="org.eclipse.debug.ui.favoriteGroups">
 <listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
 </listAttribute>
-<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="de.tum.in.far.threedui.ex2.Exercise2"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="3DUI-Class"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.library.path=${project_loc}\libs\bin;${project_loc}\libs\ubitrack\bin"/>
+<stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre6-32bit"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="de.tum.in.far.threedui.molsim.MoleculeSim"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="2011-SS-3DUI"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.library.path=D:\Developement\Eclipse-Workspace2\2011-SS-3DUI\libs\bin;D:\Developement\Eclipse-Workspace2\2011-SS-3DUI\libs\ubitrack\bin"/>
 </launchConfiguration>

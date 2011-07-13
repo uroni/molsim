@@ -49,7 +49,7 @@ class UpdateSimBehaviour extends Behavior
 
 public class MoleculeSim {
 
-	public static final String EXERCISE = "Exercise 2";
+	public static final String EXERCISE = "MoleculeSim";
 	
 	public final static String COMPONENT_DIRECTORY = System.getProperty("user.dir") + File.separator + "libs" + File.separator + "ubitrack" + File.separator + "bin" + File.separator + "ubitrack";
 	public final static String DATAFLOW_PATH = System.getProperty("user.dir") + File.separator + "dataflow" + File.separator + "3D-UI-SS-2011-Markertracker_Direct.dfg";
@@ -198,7 +198,7 @@ public class MoleculeSim {
 					realSize2.x /= Simulation.simscale;
 					absDist = Math.abs(dist - realSize1.x - realSize2.x);
 
-					System.out.println("absDist: "+absDist);
+					//System.out.println("absDist: "+absDist);
 					if(absDist > THRESHOLD * 1.2) {
 						System.out.println("disconnecting...");
 						sim.SimPretendDisconnect(a1.getConnectedId1(), a1.getConnectedId2());

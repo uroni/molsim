@@ -170,13 +170,18 @@ public class AtomPoseReceiver  extends SimplePoseReceiver {
 		mean_dist/=last_points.size();
 		travel_dist/=(last_points.size()-1);
 		
-		//System.out.println("mean_dist="+mean_dist+" travel_dist="+travel_dist+" last_points.size()="+last_points.size());
-		if(last_points.size()>=10 && travel_dist*0.3>mean_dist && mean_dist<8e-4 && System.currentTimeMillis()-last_shake_time>2000)
+		System.out.println("mean_dist="+mean_dist+" travel_dist="+travel_dist+" last_points.size()="+last_points.size());
+		if(last_points.size()>=20 && travel_dist*0.6>mean_dist && mean_dist<8e-4 && System.currentTimeMillis()-last_shake_time>2000)
 		{
 			sim.SimRemoveMolecule(atom_id);
 			atom_id=sim.SimAddAtom(atom_name, 0, 0, 0);
 			last_shake_time=System.currentTimeMillis();
 			System.out.println("DETECTED SHAKING");
+			if(connected)
+			{
+				connected=false;
+				connected_with.setConnected(false);
+			}
 		}
 		
 		Vector3d up=new Vector3d(0,0,0.07);

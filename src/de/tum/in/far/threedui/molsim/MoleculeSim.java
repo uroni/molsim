@@ -81,7 +81,7 @@ public class MoleculeSim {
 		int null_id=sim.SimAddAtom("Null", 5.f, 0.f, 0.f);
 		int catom_id=sim.SimAddAtom(name, 0.f, 0.f, 0.f);
 		BranchGroup tmp=new BranchGroup();
-		AtomPoseReceiver atomPoseReceiver = new AtomPoseReceiver(tmp, sim, catom_id, null_id, name);
+		AtomPoseReceiver atomPoseReceiver = new AtomPoseReceiver(tmp, sim, catom_id, null_id, name, viewer.getCanvas3D());
 		viewer.addObject(tmp);
 		if (!ubitrackFacade.setPoseCallback(posesink, atomPoseReceiver)) {
 			return;

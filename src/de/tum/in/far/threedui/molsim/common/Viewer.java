@@ -18,6 +18,8 @@ import javax.vecmath.Vector3f;
 import com.sun.j3d.utils.behaviors.keyboard.KeyNavigatorBehavior;
 import com.sun.j3d.utils.universe.SimpleUniverse;
 
+import de.tum.in.far.threedui.molsim.InterfaceCanvas;
+
 public class Viewer {
 
 	private static final long serialVersionUID = 1L;
@@ -27,6 +29,13 @@ public class Viewer {
 
 	private final BranchGroup rootNode;
 	
+	protected InterfaceCanvas canvas3D;
+	
+	public InterfaceCanvas getCanvas3D()
+	{
+		return canvas3D;
+	}
+	
 	public Viewer(String frameTitle) {
 		frame = new JFrame("3D UI - " + frameTitle);
 		
@@ -34,7 +43,7 @@ public class Viewer {
 		GraphicsConfiguration config = SimpleUniverse.getPreferredConfiguration();
 		
 		// Create a 3D canvas using the settings of your display
-		Canvas3D canvas3D = new Canvas3D(config);
+		canvas3D = new InterfaceCanvas(config);
 		canvas3D.setSize(800,600);
 		universe = new SimpleUniverse(canvas3D);
 		

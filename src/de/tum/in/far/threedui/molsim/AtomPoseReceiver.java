@@ -45,7 +45,7 @@ class UpdateBehaviour extends Behavior
 
 	@Override
 	public void processStimulus(Enumeration arg0) {
-		recv.cancelPosition();	
+		recv.cancelPosition();
 		wakeupOn(new WakeupOnElapsedFrames(0));
 	}
 }
@@ -63,6 +63,9 @@ class LastPoint
 
 public class AtomPoseReceiver  extends SimplePoseReceiver {
 	
+	private int recv_id;
+	private static int curr_recv_id=1;
+	
 	private Simulation sim;
 	private int atom_id;
 	private int null_id;
@@ -75,6 +78,8 @@ public class AtomPoseReceiver  extends SimplePoseReceiver {
 	private Vector3d last_pos=new Vector3d();
 	private Vector3d last_dir=new Vector3d();
 	private int curr_idle=0;
+	private int shake_state=0;
+	private long shake_start_time=0;
 	
 	public int getCurr_idle() {
 		return curr_idle;
@@ -88,8 +93,10 @@ public class AtomPoseReceiver  extends SimplePoseReceiver {
 	private boolean connected=false;
 	private int connectedId1=-1;
 	private int connectedId2=-1;
+	
+	private InterfaceCanvas ic;
 
-	AtomPoseReceiver(BranchGroup bg, Simulation sim, int atom_id, int null_id, String atom_name)
+	AtomPoseReceiver(BranchGroup bg, Simulation sim, int atom_id, int null_id, String atom_name, InterfaceCanvas ic)
 	{
 		this.sim=sim;
 		this.atom_id=atom_id;
@@ -97,6 +104,8 @@ public class AtomPoseReceiver  extends SimplePoseReceiver {
 		this.atom_name=atom_name;
 		idle_timer=new UpdateBehaviour(this);
 		bg.addChild(idle_timer);
+		recv_id=curr_recv_id++;
+		this.ic=ic;
 	}
 	
 	public void receivePose(SimplePose pose) {
@@ -169,19 +178,49 @@ public class AtomPoseReceiver  extends SimplePoseReceiver {
 		}
 		mean_dist/=last_points.size();
 		travel_dist/=(last_points.size()-1);
-		
 		System.out.println("mean_dist="+mean_dist+" travel_dist="+travel_dist+" last_points.size()="+last_points.size());
-		if(last_points.size()>=20 && travel_dist*0.6>mean_dist && mean_dist<8e-4 && System.currentTimeMillis()-last_shake_time>2000)
-		{
-			sim.SimRemoveMolecule(atom_id);
-			atom_id=sim.SimAddAtom(atom_name, 0, 0, 0);
-			last_shake_time=System.currentTimeMillis();
-			System.out.println("DETECTED SHAKING");
-			if(connected)
+		if(last_points.size()>=5 && travel_dist*13.9>mean_dist && mean_dist<8e-1 && System.currentTimeMillis()-last_shake_time>5000)
+		{			
+			System.out.println("shake_state="+shake_state);
+			if(shake_state==0)
 			{
-				connected=false;
-				connected_with.setConnected(false);
+				shake_state=1;
+				shake_start_time=System.currentTimeMillis();
 			}
+			else if(shake_state==1)
+			{
+				int pc=Math.round(((System.currentTimeMillis()-shake_start_time)/10000.f)*100.f);
+				if(ic.getOwns_id()==recv_id)
+				{
+					ic.setPc_done(pc);
+				}
+				else if(pc>ic.getPc_done())
+				{
+					ic.setOwns_id(recv_id);
+					ic.setPc_done(pc);
+				}
+				if(System.currentTimeMillis()-shake_start_time>10000)
+				{
+					shake_state=2;
+				}
+			}
+			else if(shake_state==2)
+			{
+				sim.SimRemoveMolecule(atom_id);
+				atom_id=sim.SimAddAtom(atom_name, 0, 0, 0);
+				last_shake_time=System.currentTimeMillis();
+				System.out.println("DETECTED SHAKING");
+				if(connected)
+				{
+					connected=false;
+					connected_with.setConnected(false);
+				}
+				shake_state=0;
+			}
+		}
+		else
+		{
+			shake_state=0;
 		}
 		
 		Vector3d up=new Vector3d(0,0,0.07);
@@ -222,6 +261,11 @@ public class AtomPoseReceiver  extends SimplePoseReceiver {
 	
 	public void cancelPosition()
 	{
+		if(shake_state==0 && ic.getOwns_id()==recv_id)
+		{
+			ic.setPc_done(0);
+		}
+		
 		if(System.currentTimeMillis()-last_update>=1000)
 		{
 			sim.freeAtomPosition(atom_id);

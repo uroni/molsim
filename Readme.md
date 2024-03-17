@@ -2,4 +2,6 @@
 
 In action
 
-https://raw.githubusercontent.com/uroni/molsim/master/doc/javaw%202011-07-20%2012-23-04-79.mp4
+
+https://github.com/uroni/molsim/assets/2711429/668f82a5-9155-4ecb-a327-b518680c002d
+
